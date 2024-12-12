@@ -48,6 +48,7 @@ public class ShoppingCartController
         }
         catch(Exception e)
         {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
@@ -55,21 +56,21 @@ public class ShoppingCartController
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
     @PostMapping("products/{id}")
-    public ShoppingCartItem addProduct(@PathVariable int id, Principal principal) {
+    public ShoppingCart addProduct(@PathVariable int id, Principal principal) {
         try {
             int userId = getUserId(principal);
             ShoppingCart cart = shoppingCartDao.getByUserId(userId);
-            ShoppingCartItem added = null;
 
             if (cart.contains(id)) {
                 //put
                 System.out.println("Already present");
             } else {
                 System.out.println("Adding to cart");
-                added = shoppingCartDao.addProduct(userId, productDao.getById(id));
+                shoppingCartDao.addProduct(userId, productDao.getById(id));
             }
-            return added;
+            return shoppingCartDao.getByUserId(userId);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }

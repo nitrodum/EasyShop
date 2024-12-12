@@ -9,6 +9,7 @@ import org.yearup.models.ShoppingCart;
 import org.yearup.models.User;
 
 import java.security.Principal;
+import java.util.List;
 
 // convert this class to a REST controller
 // only logged in users should have access to these actions
@@ -33,7 +34,8 @@ public class ShoppingCartController
             int userId = user.getId();
 
             // use the shoppingcartDao to get all items in the cart and return the cart
-            return null;
+            ShoppingCart cart = shoppingCartDao.getByUserId(userId);
+            return cart;
         }
         catch(Exception e)
         {

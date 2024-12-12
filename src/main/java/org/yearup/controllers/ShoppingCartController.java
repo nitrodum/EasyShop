@@ -55,18 +55,18 @@ public class ShoppingCartController
 
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
-    @PostMapping("products/{id}")
-    public ShoppingCart addProduct(@PathVariable int id, Principal principal) {
+    @PostMapping("products/{productId}")
+    public ShoppingCart addProduct(@PathVariable int productId, Principal principal) {
         try {
             int userId = getUserId(principal);
             ShoppingCart cart = shoppingCartDao.getByUserId(userId);
 
-            if (cart.contains(id)) {
+            if (cart.contains(productId)) {
                 //put
-                System.out.println("Already present");
+                shoppingCartDao.update(userId, cart.get(productId));
             } else {
                 System.out.println("Adding to cart");
-                shoppingCartDao.addProduct(userId, productDao.getById(id));
+                shoppingCartDao.addProduct(userId, productDao.getById(productId));
             }
             return shoppingCartDao.getByUserId(userId);
         } catch (Exception e) {
@@ -79,6 +79,16 @@ public class ShoppingCartController
     // add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
+    @PutMapping("products/{productId}")
+    public void updateItem(@PathVariable int productId, @RequestParam ShoppingCartItem item, Principal principal) {
+        try {
+            int userId = getUserId(principal);
+
+            shoppingCartDao.update(userId, item);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     // add a DELETE method to clear all products from the current users cart

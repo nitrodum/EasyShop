@@ -53,9 +53,9 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     @Override
     public void addProduct(int userId, Product product) {
         try (Connection connection = getConnection();
-            PreparedStatement statement = connection.prepareStatement("""
-                    INSERT INTO shopping_cart(user_id, product_id, quantity)
-                    VALUES (?, ?, 1)""", PreparedStatement.RETURN_GENERATED_KEYS) ;
+             PreparedStatement statement = connection.prepareStatement("""
+                     INSERT INTO shopping_cart(user_id, product_id, quantity)
+                     VALUES (?, ?, 1)""", PreparedStatement.RETURN_GENERATED_KEYS);
         ) {
             statement.setInt(1, userId);
             statement.setInt(2, product.getProductId());
@@ -71,12 +71,12 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     @Override
     public void update(int userId, ShoppingCartItem item) {
         try (Connection connection = getConnection();
-            PreparedStatement statement = connection.prepareStatement("""
-                    UPDATE shopping_cart
-                    SET quantity = ?
-                    WHERE user_id = ? AND product_id = ?""")
+             PreparedStatement statement = connection.prepareStatement("""
+                     UPDATE shopping_cart
+                     SET quantity = ?
+                     WHERE user_id = ? AND product_id = ?""")
         ) {
-            statement.setInt(1, item.getQuantity()+1);
+            statement.setInt(1, item.getQuantity() + 1);
             statement.setInt(2, userId);
             statement.setInt(3, item.getProductId());
 
@@ -87,7 +87,17 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     }
 
     @Override
-    public void delete(int userId, int productId) {
+    public void delete(int userId) {
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement("""
+                     DELETE FROM shopping_cart
+                     WHERE user_id = ?""")
+        ) {
+            statement.setInt(1, userId);
 
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete shopping cart for user ID: " + userId, e);
+        }
     }
 }

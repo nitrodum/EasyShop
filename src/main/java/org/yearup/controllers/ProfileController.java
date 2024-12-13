@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.ProfileDao;
 import org.yearup.data.UserDao;
 import org.yearup.models.Profile;
@@ -41,7 +40,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateProfile(Principal principal, @RequestParam Profile profile) {
+    public ResponseEntity<Void> updateProfile(Principal principal, @RequestBody Profile profile) {
         int userId = getUserId(principal);
 
         try {

@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.yearup.configurations.UserHelper;
 import org.yearup.data.OrderDao;
 import org.yearup.models.Order;
 
 import java.security.Principal;
+import java.sql.SQLException;
 
 @RestController
 @RequestMapping("orders")
@@ -18,13 +20,28 @@ import java.security.Principal;
 public class OrdersController {
 
     private final OrderDao orderDao;
+    private UserHelper userHelper;
 
-    public OrdersController(OrderDao orderDao) {
+    public OrdersController(OrderDao orderDao, UserHelper userHelper) {
         this.orderDao = orderDao;
+        this.userHelper = userHelper;
     }
 
     @PostMapping
     public ResponseEntity<Order> order(Principal principal) {
-        return null;
+        int userId = userHelper.getUserId(principal);
+
+        try {
+            Order order = orderDao.create(userId);
+
+            if (order == null) {
+                return ResponseEntity.internalServerError().build();
+            }
+
+            return ResponseEntity.ok(order);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

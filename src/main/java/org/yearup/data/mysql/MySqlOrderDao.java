@@ -14,7 +14,7 @@ public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
     }
 
     @Override
-    public Order create(Order order) {
+    public Order create(int userId) {
         return null;
     }
 }

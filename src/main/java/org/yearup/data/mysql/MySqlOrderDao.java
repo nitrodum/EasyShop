@@ -2,6 +2,7 @@ package org.yearup.data.mysql;
 
 import org.springframework.stereotype.Component;
 import org.yearup.data.OrderDao;
+import org.yearup.data.OrderItemDao;
 import org.yearup.data.ProductDao;
 import org.yearup.models.Order;
 import org.yearup.models.OrderItem;
@@ -16,10 +17,12 @@ import java.time.LocalDateTime;
 public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
 
     private final ProductDao productDao;
+    private final OrderItemDao orderItemDao;
 
-    public MySqlOrderDao(DataSource dataSource, ProductDao productDao) {
+    public MySqlOrderDao(DataSource dataSource, ProductDao productDao, OrderItemDao orderItemDao {
         super(dataSource);
         this.productDao = productDao;
+        this.orderItemDao = orderItemDao;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
                     item.setProductId(productId);
                     item.setQuantity(rs.getInt("sales_price"));
                     item.setSalesPrice(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
-                    //orderItemDao.create(orderItem);
+                    orderItemDao.create(item);
                 }
             }
         } catch (SQLException e) {

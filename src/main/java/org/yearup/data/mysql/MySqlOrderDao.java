@@ -2,19 +2,109 @@ package org.yearup.data.mysql;
 
 import org.springframework.stereotype.Component;
 import org.yearup.data.OrderDao;
+import org.yearup.data.ProductDao;
 import org.yearup.models.Order;
+import org.yearup.models.OrderItem;
+import org.yearup.models.Product;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.time.LocalDateTime;
 
 @Component
 public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
 
-    public MySqlOrderDao(DataSource dataSource) {
+    private final ProductDao productDao;
+
+    public MySqlOrderDao(DataSource dataSource, ProductDao productDao) {
         super(dataSource);
+        this.productDao = productDao;
     }
 
     @Override
     public Order create(int userId) {
-        return null;
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setDate(LocalDateTime.now());
+
+        setOrderAddress(userId, order);
+        int orderId = setUserDetails(userId, order);
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement("""
+                     SELECT * FROM shopping_cart
+                     WHERE user_id = ?""")
+        ) {
+            statement.setInt(1, userId);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    int productId = rs.getInt("product_id");
+                    Product product = productDao.getById(productId);
+                    int quantity = rs.getInt("quantity");
+                    OrderItem item = new OrderItem();
+                    item.setOrderId(orderId);
+                    item.setProductId(productId);
+                    item.setQuantity(rs.getInt("sales_price"));
+                    item.setSalesPrice(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
+                    //orderItemDao.create(orderItem);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return order;
+    }
+
+    private int setUserDetails(int userId, Order order) {
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement("""
+                    INSERT INTO orders(user_id, date, address, city, state, zip)
+                    VALUES(?, ?, ?, ?, ?, ?)""", PreparedStatement.RETURN_GENERATED_KEYS)
+        ) {
+            statement.setInt(1, userId);
+            statement.setTimestamp(2, Timestamp.valueOf(order.getDate()));
+            statement.setString(3, order.getAddress());
+            statement.setString(4, order.getCity());
+            statement.setString(5, order.getState());
+            statement.setString(6, order.getZip());
+
+            int rows = statement.executeUpdate();
+
+            if (rows > 0) {
+                ResultSet generatedKeys = statement.getGeneratedKeys();
+
+                if (generatedKeys.next()) {
+                    System.out.println("Order Updated!");
+                    return generatedKeys.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return -1;
+    }
+
+    private void setOrderAddress(int userId, Order order) {
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement("""
+                    SELECT * FROM profiles
+                    WHERE user_id = ?""")
+        ) {
+            statement.setInt(1, userId);
+
+            ResultSet row = statement.executeQuery();
+
+            if (row.next()) {
+                order.setAddress(row.getString("Address"));
+                order.setCity(row.getString("City"));
+                order.setState(row.getString("State"));
+                order.setZip(row.getString("Zip"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

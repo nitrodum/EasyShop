@@ -20,7 +20,7 @@ import java.sql.SQLException;
 public class OrdersController {
 
     private final OrderDao orderDao;
-    private UserHelper userHelper;
+    private final UserHelper userHelper;
 
     public OrdersController(OrderDao orderDao, UserHelper userHelper) {
         this.orderDao = orderDao;
@@ -41,6 +41,7 @@ public class OrdersController {
             return ResponseEntity.ok(order);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

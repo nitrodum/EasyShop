@@ -13,8 +13,7 @@ public class OrderItem {
 
     public OrderItem() {}
 
-    public OrderItem(int orderItemId, int orderId, int productId, BigDecimal salesPrice, int quantity, BigDecimal discount) {
-        this.orderItemId = orderItemId;
+    public OrderItem(int orderId, int productId, BigDecimal salesPrice, int quantity, BigDecimal discount) {
         this.orderId = orderId;
         this.productId = productId;
         this.salesPrice = salesPrice;

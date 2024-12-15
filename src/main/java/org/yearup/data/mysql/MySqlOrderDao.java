@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import org.yearup.data.OrderDao;
 import org.yearup.data.OrderItemDao;
 import org.yearup.data.ProductDao;
+import org.yearup.data.ShoppingCartDao;
 import org.yearup.models.Order;
 import org.yearup.models.OrderItem;
 import org.yearup.models.Product;
@@ -18,11 +19,13 @@ public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
 
     private final ProductDao productDao;
     private final OrderItemDao orderItemDao;
+    private final ShoppingCartDao shoppingCartDao;
 
-    public MySqlOrderDao(DataSource dataSource, ProductDao productDao, OrderItemDao orderItemDao {
+    public MySqlOrderDao(DataSource dataSource, ProductDao productDao, OrderItemDao orderItemDao, MySqlShoppingCartDao shoppingCartDao) {
         super(dataSource);
         this.productDao = productDao;
         this.orderItemDao = orderItemDao;
+        this.shoppingCartDao = shoppingCartDao;
     }
 
     @Override
@@ -32,7 +35,9 @@ public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
         order.setDate(LocalDateTime.now());
 
         setOrderAddress(userId, order);
-        int orderId = setUserDetails(userId, order);
+        order.setOrderId(setUserDetails(userId, order));
+
+        double shippingAmount = 0;
 
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement("""
@@ -46,17 +51,42 @@ public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
                     Product product = productDao.getById(productId);
                     int quantity = rs.getInt("quantity");
                     OrderItem item = new OrderItem();
-                    item.setOrderId(orderId);
+                    item.setOrderId(order.getOrderId());
                     item.setProductId(productId);
-                    item.setQuantity(rs.getInt("sales_price"));
+                    item.setQuantity(quantity);
                     item.setSalesPrice(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
+                    shippingAmount += item.getSalesPrice().doubleValue();
                     orderItemDao.create(item);
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        order.setShipping_amount(BigDecimal.valueOf(shippingAmount));
+
+        updateShippingAmount(order);
+
+        shoppingCartDao.delete(userId);
+
         return order;
+    }
+
+    private void updateShippingAmount(Order order) {
+        try (Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement("""
+                    UPDATE orders
+                    SET shipping_amount = ?
+                    WHERE order_id = ?""")
+        ) {
+            statement.setBigDecimal(1, order.getShipping_amount());
+            statement.setInt(2, order.getOrderId());
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private int setUserDetails(int userId, Order order) {
@@ -78,13 +108,11 @@ public class MySqlOrderDao extends MySqlDaoBase implements OrderDao {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
 
                 if (generatedKeys.next()) {
-                    System.out.println("Order Updated!");
                     return generatedKeys.getInt(1);
                 }
             }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
         return -1;

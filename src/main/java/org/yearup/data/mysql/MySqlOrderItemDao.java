@@ -22,7 +22,7 @@ public class MySqlOrderItemDao extends MySqlDaoBase implements OrderItemDao {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement("""
                      INSERT INTO order_line_items (order_id, product_id, sales_price, quantity, discount)
-                     VALUES (?, ?, ?, ?, ?)""")
+                     VALUES (?, ?, ?, ?, ?)""", PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             statement.setInt(1, orderItem.getOrderId());
             statement.setInt(2, orderItem.getProductId());
@@ -32,13 +32,6 @@ public class MySqlOrderItemDao extends MySqlDaoBase implements OrderItemDao {
 
             int rows = statement.executeUpdate();
 
-            if (rows > 0) {
-                ResultSet generatedKeys = statement.getGeneratedKeys();
-
-                if (generatedKeys.next()) {
-
-                }
-            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -9,7 +9,7 @@ public class OrderItem {
     private int productId;
     private BigDecimal salesPrice;
     private int quantity;
-    private BigDecimal discount;
+    private BigDecimal discount = BigDecimal.ZERO;
 
     public OrderItem() {}
 

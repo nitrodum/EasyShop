@@ -5,10 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.yearup.configurations.UserHelper;
 import org.yearup.data.ProfileDao;
-import org.yearup.data.UserDao;
 import org.yearup.models.Profile;
-import org.yearup.models.User;
 
 import java.security.Principal;
 
@@ -19,17 +18,17 @@ import java.security.Principal;
 public class ProfileController {
 
     private ProfileDao profileDao;
-    private UserDao userDao;
+    private UserHelper userHelper;
 
     @Autowired
-    public ProfileController(ProfileDao profileDao, UserDao userDao) {
+    public ProfileController(ProfileDao profileDao, UserHelper userHelper) {
         this.profileDao = profileDao;
-        this.userDao = userDao;
+        this.userHelper = userHelper;
     }
 
     @GetMapping
     public ResponseEntity<Profile> getProfile(Principal principal) {
-        int userId = getUserId(principal);
+        int userId = userHelper.getUserId(principal);
 
         Profile profile = profileDao.getById(userId);
 
@@ -41,7 +40,7 @@ public class ProfileController {
 
     @PutMapping
     public ResponseEntity<Void> updateProfile(Principal principal, @RequestBody Profile profile) {
-        int userId = getUserId(principal);
+        int userId = userHelper.getUserId(principal);
 
         try {
             profileDao.update(userId, profile);
@@ -49,14 +48,5 @@ public class ProfileController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    private int getUserId(Principal principal) {
-        // get the currently logged-in username
-        String userName = principal.getName();
-        // find database user by userId
-        User user = userDao.getByUserName(userName);
-
-        return user.getId();
     }
 }

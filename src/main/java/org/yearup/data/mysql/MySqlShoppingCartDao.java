@@ -16,7 +16,7 @@ import java.sql.SQLException;
 @Component
 public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDao {
 
-    ProductDao productDao;
+    private ProductDao productDao;
 
     public MySqlShoppingCartDao(DataSource dataSource, ProductDao productDao) {
         super(dataSource);

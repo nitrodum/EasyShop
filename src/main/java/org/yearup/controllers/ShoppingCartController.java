@@ -3,15 +3,13 @@ package org.yearup.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.yearup.configurations.UserHelper;
 import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
-import org.yearup.data.UserDao;
 import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
-import org.yearup.models.User;
 
 import java.security.Principal;
 
@@ -25,20 +23,20 @@ public class ShoppingCartController
 {
     // a shopping cart requires
     private final ShoppingCartDao shoppingCartDao;
-    private final UserDao userDao;
     private final ProductDao productDao;
+    private final UserHelper userHelper;
 
-    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
+    public ShoppingCartController(ShoppingCartDao shoppingCartDao, ProductDao productDao, UserHelper userHelper) {
         this.shoppingCartDao = shoppingCartDao;
-        this.userDao = userDao;
         this.productDao = productDao;
+        this.userHelper = userHelper;
     }
 
     // each method in this controller requires a Principal object as a parameter
     @GetMapping
     public ResponseEntity<ShoppingCart> getCart(Principal principal) {
         try {
-            int userId = getUserId(principal);
+            int userId = userHelper.getUserId(principal);
             ShoppingCart cart = shoppingCartDao.getByUserId(userId);
             return ResponseEntity.ok(cart);
         } catch (Exception e) {
@@ -49,7 +47,7 @@ public class ShoppingCartController
     @PostMapping("products/{productId}")
     public ResponseEntity<ShoppingCart> addProduct(@PathVariable int productId, Principal principal) {
         try {
-            int userId = getUserId(principal);
+            int userId = userHelper.getUserId(principal);
             ShoppingCart cart = shoppingCartDao.getByUserId(userId);
 
             if (cart.contains(productId)) {
@@ -72,7 +70,7 @@ public class ShoppingCartController
     @PutMapping("products/{productId}")
     public ResponseEntity<Void> updateItem(@PathVariable int productId, @RequestBody ShoppingCartItem item, Principal principal) {
         try {
-            int userId = getUserId(principal);
+            int userId = userHelper.getUserId(principal);
             Product p = new Product();
             p.setProductId(productId);
             item.setProduct(p);
@@ -86,7 +84,7 @@ public class ShoppingCartController
     @DeleteMapping
     public ResponseEntity<ShoppingCart> deleteCart(Principal principal) {
         try {
-            int userId = getUserId(principal);
+            int userId = userHelper.getUserId(principal);
             shoppingCartDao.delete(userId);
             return ResponseEntity.ok(shoppingCartDao.getByUserId(userId));
         } catch (Exception e) {
@@ -94,14 +92,6 @@ public class ShoppingCartController
         }
     }
 
-    private int getUserId(Principal principal) {
-        // get the currently logged-in username
-        String userName = principal.getName();
-        // find database user by userId
-        User user = userDao.getByUserName(userName);
-
-        return user.getId();
-    }
 }
 
 

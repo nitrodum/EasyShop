@@ -88,6 +88,13 @@ class ShoppingCartService {
         h1.innerText = "Cart";
         cartHeader.appendChild(h1);
 
+        const confirmButton = document.createElement("button");
+        confirmButton.classList.add("btn")
+        confirmButton.classList.add("btn-success")
+        confirmButton.innerText = "Confirm";
+        confirmButton.addEventListener("click", () => this.confirmOrder());
+        cartHeader.appendChild(confirmButton)
+
         const button = document.createElement("button");
         button.classList.add("btn")
         button.classList.add("btn-danger")
@@ -98,10 +105,33 @@ class ShoppingCartService {
         contentDiv.appendChild(cartHeader)
         main.appendChild(contentDiv);
 
+
+
         // let parent = document.getElementById("cart-item-list");
         this.cart.items.forEach(item => {
             this.buildItem(item, contentDiv)
         });
+    }
+
+    confirmOrder() {
+        const url = `${config.baseUrl}/orders`;
+        console.log(url);
+        axios
+          .post(url)
+          .then((response) => {
+            if (response.data) {
+                alert('Order confirmed!');
+                this.clearCart()
+            } else {
+                alert('Failed to confirm order. Please try again.');
+            }
+          })
+          .catch((error) => {
+            const data = {
+              error: "Checkout failed.",
+            };
+            templateBuilder.append("error", data, "errors");
+          });
     }
 
     buildItem(item, parent)

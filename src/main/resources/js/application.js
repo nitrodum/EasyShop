@@ -34,6 +34,7 @@ function loadHome()
 
     productService.search();
     categoryService.getAllCategories(loadCategories);
+
 }
 
 function editProfile()

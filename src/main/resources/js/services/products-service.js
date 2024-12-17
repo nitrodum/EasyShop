@@ -10,6 +10,8 @@ class ProductService {
         minPrice: undefined,
         maxPrice: undefined,
         color: undefined,
+        page: 1,
+        pageSize: 9,
         queryString: () => {
             let qs = "";
             if(this.filter.cat){ qs = `cat=${this.filter.cat}`; }
@@ -31,6 +33,7 @@ class ProductService {
                 if(qs.length>0) {   qs += `&${col}`; }
                 else { qs = col; }
             }
+            qs += (qs.length ? "&" : "") + `page=${this.filter.page}&pageSize=${this.filter.pageSize}`;
 
             return qs.length > 0 ? `?${qs}` : "";
         }
@@ -43,6 +46,8 @@ class ProductService {
             .then(response => {
                 this.photos = response.data;
             });
+
+
     }
 
     hasPhoto(photo){
@@ -105,6 +110,7 @@ class ProductService {
 
                  templateBuilder.build('product', data, 'content', this.enableButtons);
 
+                 this.updatePagination();
              })
             .catch(error => {
 
@@ -114,6 +120,33 @@ class ProductService {
 
                 templateBuilder.append("error", data, "errors")
             });
+
+    }
+
+    updatePagination() {
+        const currentPage = this.filter.page;
+
+        const paginationData = {
+            page: currentPage,
+            prevDisabled: currentPage === 1,
+        };
+
+        templateBuilder.appendWithCallback('pagination', paginationData, 'content', () => {
+            this.addPaginationEventListeners();
+        });
+    }
+
+
+    addPaginationEventListeners() {
+        document.getElementById("next-page").addEventListener("click", () => {
+            const currentPage = this.filter.page;
+            this.setPage(currentPage + 1);
+        });
+
+        document.getElementById("prev-page").addEventListener("click", () => {
+            const currentPage = this.filter.page;
+            this.setPage(currentPage - 1);
+        });
     }
 
     enableButtons()
@@ -134,10 +167,18 @@ class ProductService {
         }
     }
 
+    setPage(pageNumber) {
+        this.filter.page = pageNumber;
+        this.search();
+    }
+
+    setPageSize(size) {
+        this.filter.pageSize = size;
+        this.filter.page = 1;
+        this.search();
+    }
+
 }
-
-
-
 
 
 document.addEventListener('DOMContentLoaded', () => {

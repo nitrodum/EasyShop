@@ -1,9 +1,40 @@
 let productService;
 
+class LRUCache {
+    constructor(maxSize) {
+        this.maxSize = maxSize;
+        this.cache = new Map();
+    }
+
+    get(key) {
+        if (!this.cache.has(key)) return null;
+
+        const value = this.cache.get(key);
+
+        this.cache.delete(key);
+        this.cache.set(key, value);
+        return value;
+    }
+
+    set(key, value) {
+        if (this.cache.has(key)) {
+            this.cache.delete(key);
+        }
+
+        this.cache.set(key, value);
+        console.log(this.cache.size)
+        if (this.cache.size > this.maxSize) {
+            const firstKey = this.cache.keys().next().value;
+            console.log(firstKey);
+            this.cache.delete(firstKey);
+        }
+    }
+}
+
 class ProductService {
 
     photos = [];
-
+    cache = new LRUCache(10);
 
     filter = {
         cat: undefined,
@@ -94,7 +125,15 @@ class ProductService {
 
     search()
     {
-        const url = `${config.baseUrl}/products${this.filter.queryString()}`;
+        const queryKey = this.filter.queryString();
+        const url = `${config.baseUrl}/products${queryKey}`;
+
+        const cachedData = this.cache.get(queryKey);
+        if(cachedData) {
+            console.log("Cached data retrieved", queryKey);
+            this.renderProducts(cachedData);
+            return;
+        }
 
         axios.get(url)
              .then(response => {
@@ -108,9 +147,11 @@ class ProductService {
                      }
                  })
 
-                 templateBuilder.build('product', data, 'content', this.enableButtons);
+                this.cache.set(queryKey, data);
+                console.log("Caching data", queryKey);
 
-                 this.updatePagination();
+                this.renderProducts(data);
+
              })
             .catch(error => {
 
@@ -121,6 +162,11 @@ class ProductService {
                 templateBuilder.append("error", data, "errors")
             });
 
+    }
+
+    renderProducts(data) {
+        templateBuilder.build('product', data, 'content', this.enableButtons);
+         this.updatePagination();
     }
 
     updatePagination() {

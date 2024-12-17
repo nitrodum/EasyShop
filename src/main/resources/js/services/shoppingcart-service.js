@@ -88,13 +88,6 @@ class ShoppingCartService {
         h1.innerText = "Cart";
         cartHeader.appendChild(h1);
 
-        const confirmButton = document.createElement("button");
-        confirmButton.classList.add("btn")
-        confirmButton.classList.add("btn-success")
-        confirmButton.innerText = "Confirm";
-        confirmButton.addEventListener("click", () => this.confirmOrder());
-        cartHeader.appendChild(confirmButton)
-
         const button = document.createElement("button");
         button.classList.add("btn")
         button.classList.add("btn-danger")
@@ -105,12 +98,32 @@ class ShoppingCartService {
         contentDiv.appendChild(cartHeader)
         main.appendChild(contentDiv);
 
-
-
         // let parent = document.getElementById("cart-item-list");
         this.cart.items.forEach(item => {
             this.buildItem(item, contentDiv)
         });
+
+        const cartFooter = document.createElement("div");
+        cartFooter.classList.add("cart-header");
+
+        const cartTotal = document.createElement("h1");
+        cartTotal.innerText = "Total: $";
+
+        const cartTotalValue = document.createElement("span");
+        cartTotalValue.id = "cart-total-value";
+        cartTotalValue.innerText = this.cart.total.toFixed(2);
+
+        cartTotal.appendChild(cartTotalValue);
+        cartFooter.appendChild(cartTotal);
+
+        const confirmButton = document.createElement("button");
+        confirmButton.classList.add("btn");
+        confirmButton.classList.add("btn-success");
+        confirmButton.innerText = "Confirm";
+        confirmButton.addEventListener("click", () => this.confirmOrder());
+        cartFooter.appendChild(confirmButton);
+
+        contentDiv.appendChild(cartFooter);
     }
 
     confirmOrder() {

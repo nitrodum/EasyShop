@@ -21,13 +21,14 @@ class LRUCache {
             this.cache.delete(key);
         }
 
-        this.cache.set(key, value);
-        console.log(this.cache.size)
-        if (this.cache.size > this.maxSize) {
+        if (this.cache.size == this.maxSize) {
             const firstKey = this.cache.keys().next().value;
-            console.log(firstKey);
             this.cache.delete(firstKey);
         }
+
+         this.cache.set(key, value);
+         //console.log(this.cache.size)
+
     }
 }
 
@@ -180,10 +181,11 @@ class ProductService {
         ];
 
         pagesToPrefetch.forEach(({ page, key }) => {
-        console.log(page, key);
+        //console.log(page, key);
+
             if (page > 0 && !this.cache.get(key)) {
                 const url = `${config.baseUrl}/products${key}`;
-                console.log(`Prefetching page: ${page}`);
+                //console.log(`Prefetching page: ${page}`);
 
                 axios.get(url)
                      .then(response => {

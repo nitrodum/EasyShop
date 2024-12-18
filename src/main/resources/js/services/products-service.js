@@ -132,6 +132,7 @@ class ProductService {
         if(cachedData) {
             console.log("Cached data retrieved", queryKey);
             this.renderProducts(cachedData);
+            this.prefetchAdjacentPages();
             return;
         }
 
@@ -149,6 +150,7 @@ class ProductService {
 
                 this.cache.set(queryKey, data);
                 console.log("Caching data", queryKey);
+                this.prefetchAdjacentPages();
 
                 this.renderProducts(data);
 
@@ -167,6 +169,47 @@ class ProductService {
     renderProducts(data) {
         templateBuilder.build('product', data, 'content', this.enableButtons);
          this.updatePagination();
+    }
+
+    prefetchAdjacentPages() {
+        const currentPage = this.filter.page;
+
+        const pagesToPrefetch = [
+            { page: currentPage - 1, key: this.getPageKey(currentPage - 1)},
+            { page: currentPage + 1, key: this.getPageKey(currentPage + 1)}
+        ];
+
+        pagesToPrefetch.forEach(({ page, key }) => {
+        console.log(page, key);
+            if (page > 0 && !this.cache.get(key)) {
+                const url = `${config.baseUrl}/products${key}`;
+                console.log(`Prefetching page: ${page}`);
+
+                axios.get(url)
+                     .then(response => {
+                         let data = {};
+                         data.products = response.data;
+
+                         data.products.forEach(product => {
+                             if(!this.hasPhoto(product.imageUrl))
+                             {
+                                 product.imageUrl = "no-image.jpg";
+                             }
+                         })
+
+                        this.cache.set(key, data);
+
+                     })
+                    .catch(error => {
+
+                        const data = {
+                            error: "Searching products failed."
+                        };
+
+                        templateBuilder.append("error", data, "errors")
+                    });
+            }
+        });
     }
 
     updatePagination() {
@@ -222,6 +265,14 @@ class ProductService {
         this.filter.pageSize = size;
         this.filter.page = 1;
         this.search();
+    }
+
+    getPageKey(page) {
+        const originalPage = this.filter.page;
+        this.filter.page = page;
+        const key = this.filter.queryString();
+        this.filter.page = originalPage;
+        return key;
     }
 
 }

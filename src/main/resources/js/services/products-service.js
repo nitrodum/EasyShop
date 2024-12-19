@@ -23,11 +23,12 @@ class LRUCache {
 
         if (this.cache.size == this.maxSize) {
             const firstKey = this.cache.keys().next().value;
+            //console.log("Key Deleted: ", firstKey)
             this.cache.delete(firstKey);
         }
 
          this.cache.set(key, value);
-         //console.log(this.cache.size)
+         //console.log("cache size: ", this.cache.size)
 
     }
 }
@@ -131,7 +132,7 @@ class ProductService {
 
         const cachedData = this.cache.get(queryKey);
         if(cachedData) {
-            console.log("Cached data retrieved", queryKey);
+            //console.log("Cached data retrieved", queryKey);
             this.renderProducts(cachedData);
             this.prefetchAdjacentPages();
             return;
@@ -150,10 +151,9 @@ class ProductService {
                  })
 
                 this.cache.set(queryKey, data);
-                console.log("Caching data", queryKey);
-                this.prefetchAdjacentPages();
-
+                //console.log("Caching data", queryKey);
                 this.renderProducts(data);
+                this.prefetchAdjacentPages();
 
              })
             .catch(error => {
@@ -164,12 +164,10 @@ class ProductService {
 
                 templateBuilder.append("error", data, "errors")
             });
-
     }
 
     renderProducts(data) {
-        templateBuilder.build('product', data, 'content', this.enableButtons);
-         this.updatePagination();
+        templateBuilder.build('product', data, 'content', this.enableButtons, this);
     }
 
     prefetchAdjacentPages() {

@@ -2,7 +2,7 @@ let templateBuilder = {};
 
 class TemplateBuilder
 {
-    build(templateName, value, target, callback)
+    build(templateName, value, target, callback, productservice = null)
     {
         axios.get(`templates/${templateName}.html`)
             .then(response => {
@@ -13,6 +13,9 @@ class TemplateBuilder
                     document.getElementById(target).innerHTML = html;
 
                     if(callback) callback();
+                    if(productservice) {
+                        productservice.updatePagination();
+                    }
                 }
                 catch(e)
                 {

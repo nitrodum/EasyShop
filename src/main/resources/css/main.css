@@ -202,18 +202,27 @@ main > .content-form .cart-item
 
 #pagination {
     display: flex;
-    justify-content: center;
-    margin-top: 20px;
+    justify-content: space-between; /* Distribute space evenly between items */
+    align-items: center; /* Center items vertically */
+    width: 100%; /* Make it span the full width of the parent container */
+    padding: 10px; /* Optional padding for spacing */
+    box-sizing: border-box; /* Include padding in the width calculation */
 }
 
-.page-button {
-    padding: 10px 20px;
-    margin: 0 10px;
+#pagination .btn-danger {
+    background-color: #dc3545; /* Bootstrap danger color */
+    color: #fff; /* White text */
+    border: none; /* Remove default button border */
+    padding: 8px 16px; /* Add some padding */
     cursor: pointer;
+    border-radius: 4px; /* Optional rounded corners */
 }
 
-.page-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+#pagination .btn-danger:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+#page-info {
+    font-weight: bold; /* Make the text bold */
 }
 

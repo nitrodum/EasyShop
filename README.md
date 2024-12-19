@@ -5,6 +5,17 @@ The application provides a seamless user experience with advanced filtering,
 rate-limiting, and efficient caching mechanisms. It supports user-specific features
 like profile management, shopping cart functionality, and a secure checkout system.
 
+## Table of Contents
+1. [Getting Started](#getting-started)
+2. [Features](#features)
+   1. [Home Page](#dynamic-home-page)
+   2. [Login](#login-feature)
+   3. [Profile](#profile-management)
+   4. [Shopping Cart](#shopping-cart)
+   5. [Checkout](#checkout)
+   6. [Rate Limiting](#rate-limiting)
+3. [Code Highlight](#code-highlight-efficient-pagination-with-lru-caching)
+4. [Future Improvements](#future-improvements)
 ## Getting Started
 ### Prerequisites
 - Java 17 or later
@@ -110,3 +121,5 @@ class LRUCache {
 - **Wishlist**: Enable users to save products for future purchases.
 - **Optimized Prefetching**: Improve the caching system to dynamically adjust prefetching.
 - **Admin Dashboard**: Introduce analytics and controls for managing products, users, and orders.
+
+[Back to Top](#easyshop)

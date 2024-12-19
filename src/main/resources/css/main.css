@@ -209,17 +209,18 @@ main > .content-form .cart-item
     box-sizing: border-box; /* Include padding in the width calculation */
 }
 
-#pagination .btn-danger {
-    background-color: #dc3545; /* Bootstrap danger color */
-    color: #fff; /* White text */
-    border: none; /* Remove default button border */
-    padding: 8px 16px; /* Add some padding */
+#pagination .btn {
+    background-color: #808080;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
     cursor: pointer;
-    border-radius: 4px; /* Optional rounded corners */
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-#pagination .btn-danger:hover {
-    background-color: #c82333; /* Darker red on hover */
+#pagination .btn:hover {
+    background-color: #505050;
 }
 
 #page-info {

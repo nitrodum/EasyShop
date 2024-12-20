@@ -119,6 +119,7 @@ class LRUCache {
 - **OAuth2 Integration**: Strengthen user authentication with industry-standard security practices.
 - **Product Search**: Add a search bar for users to quickly find products by name or description.
 - **Wishlist**: Enable users to save products for future purchases.
+- **Enhanced API Rate Limit Handling**: Update the client-side to handle `TOO_MANY_REQUESTS` responses more effectively
 - **Optimized Prefetching**: Improve the caching system to dynamically adjust prefetching.
 - **Admin Dashboard**: Introduce analytics and controls for managing products, users, and orders.
 

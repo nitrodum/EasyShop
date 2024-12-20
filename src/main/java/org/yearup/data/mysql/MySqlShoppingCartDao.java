@@ -76,7 +76,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                      SET quantity = ?
                      WHERE user_id = ? AND product_id = ?""")
         ) {
-            statement.setInt(1, item.getQuantity() + 1);
+            statement.setInt(1, item.getQuantity());
             statement.setInt(2, userId);
             statement.setInt(3, item.getProductId());
 

@@ -200,3 +200,30 @@ main > .content-form .cart-item
     margin-bottom: 2px !important;
 }
 
+#pagination {
+    display: flex;
+    justify-content: space-between; /* Distribute space evenly between items */
+    align-items: center; /* Center items vertically */
+    width: 100%; /* Make it span the full width of the parent container */
+    padding: 10px; /* Optional padding for spacing */
+    box-sizing: border-box; /* Include padding in the width calculation */
+}
+
+#pagination .btn {
+    background-color: #808080;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+#pagination .btn:hover {
+    background-color: #505050;
+}
+
+#page-info {
+    font-weight: bold; /* Make the text bold */
+}
+

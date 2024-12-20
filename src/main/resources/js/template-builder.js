@@ -2,7 +2,7 @@ let templateBuilder = {};
 
 class TemplateBuilder
 {
-    build(templateName, value, target, callback)
+    build(templateName, value, target, callback, productservice = null)
     {
         axios.get(`templates/${templateName}.html`)
             .then(response => {
@@ -13,6 +13,9 @@ class TemplateBuilder
                     document.getElementById(target).innerHTML = html;
 
                     if(callback) callback();
+                    if(productservice) {
+                        productservice.updatePagination();
+                    }
                 }
                 catch(e)
                 {
@@ -52,6 +55,28 @@ class TemplateBuilder
                  }
              })
     }
+
+    appendWithCallback(templateName, value, target, callback)
+        {
+            axios.get(`templates/${templateName}.html`)
+                .then(response => {
+                    try
+                    {
+                        const template = response.data;
+                         const html = Mustache.render(template, value);
+
+                         const element = this.createElementFromHTML(html);
+                         const parent = document.getElementById(target);
+                         parent.appendChild(element);
+
+                        if(callback) callback();
+                    }
+                    catch(e)
+                    {
+                        console.log(e);
+                    }
+                })
+        }
 
     createElementFromHTML(htmlString)
     {

@@ -119,7 +119,7 @@ class ShoppingCartService {
         const confirmButton = document.createElement("button");
         confirmButton.classList.add("btn");
         confirmButton.classList.add("btn-success");
-        confirmButton.innerText = "Confirm";
+        confirmButton.innerText = "Checkout";
         confirmButton.addEventListener("click", () => this.confirmOrder());
         cartFooter.appendChild(confirmButton);
 

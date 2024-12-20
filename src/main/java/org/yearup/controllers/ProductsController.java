@@ -29,15 +29,18 @@ public class ProductsController
     public List<Product> search(@RequestParam(name="cat", required = false) Integer categoryId,
                                 @RequestParam(name="minPrice", required = false) BigDecimal minPrice,
                                 @RequestParam(name="maxPrice", required = false) BigDecimal maxPrice,
-                                @RequestParam(name="color", required = false) String color
+                                @RequestParam(name="color", required = false) String color,
+                                @RequestParam(name="page", required = false) Integer page,
+                                @RequestParam(name="pageSize", required = false) Integer pageSize
                                 )
     {
         try
         {
-            return productDao.search(categoryId, minPrice, maxPrice, color);
+            return productDao.search(categoryId, minPrice, maxPrice, color, page, pageSize);
         }
         catch(Exception ex)
         {
+            ex.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }

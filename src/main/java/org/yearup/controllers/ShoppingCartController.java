@@ -51,7 +51,9 @@ public class ShoppingCartController
             ShoppingCart cart = shoppingCartDao.getByUserId(userId);
 
             if (cart.contains(productId)) {
-                shoppingCartDao.update(userId, cart.get(productId));
+                ShoppingCartItem item = cart.get(productId);
+                item.setQuantity(item.getQuantity()+1);
+                shoppingCartDao.update(userId, item);
             } else {
                 Product product = productDao.getById(productId);
                 if (product == null) {
